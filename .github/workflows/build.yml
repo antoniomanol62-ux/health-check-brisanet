@@ -1,0 +1,15 @@
+name: Build e Teste
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build da imagem Docker
+        run: docker build -t health-check .
+      - name: Testa se o container roda
+        run: docker run health-check
