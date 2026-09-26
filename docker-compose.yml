@@ -4,7 +4,9 @@ services:
     image: prom/prometheus:latest
     ports:
       - "9090:9090"
+    restart: unless-stopped
   grafana:
     image: grafana/grafana:latest
     ports:
       - "3000:3000"
+    restart: unless-stopped
