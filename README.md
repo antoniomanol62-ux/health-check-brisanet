@@ -1,1 +1,57 @@
-# Health Check Brisanet Sistema de monitoramento automatizado que verifica se os sites da Brisanet estão no ar, com stack completa de observabilidade e pipeline de CI/CD. ## O problema que resolve Verificar manualmente se um site está no ar é lento e não escala: alguém precisa lembrar de checar, abrir o navegador, conferir cada URL. Esse projeto automatiza isso: um script roda a verificação, os resultados viram métricas visíveis em dashboard, e todo o ambiente sobe com um único comando. ## Stack - Bash + curl — script de verificação HTTP (health_check.sh) - Docker — containeriza o script de verificação - Docker Compose — orquestra Prometheus + Grafana junto com a aplicação - Prometheus — coleta métricas - Grafana — visualiza os dados coletados - GitHub Actions — pipeline de CI/CD: builda e testa a imagem a cada push ## Como rodar git clone https://github.com/antoniomanol62-ux/health-check-brisanet.git cd health-check-brisanet docker compose up -d Depois de subir: - Prometheus: http://localhost:9090 - Grafana: http://localhost:3000 (login padrão: admin/admin) ## Estrutura - health_check.sh — verifica status HTTP dos sites e loga o resultado - Dockerfile — containeriza o script - docker-compose.yml — sobe Prometheus e Grafana, com restart automático - .github/workflows/build.yml — pipeline de CI: builda e testa a cada push na main ## Sobre o projeto Construído como prática de DevOps júnior: containerização, orquestração multi-serviço, observabilidade e automação de pipeline — do zero, com foco em entender cada peça antes de empilhar a próxima.# Health Check Brisanet Sistema de monitoramento automatizado que verifica se os sites da Brisanet estão no ar, com stack completa de observabilidade e pipeline de CI/CD. ## O problema que resolve Verificar manualmente se um site está no ar é lento e não escala: alguém precisa lembrar de checar, abrir o navegador, conferir cada URL. Esse projeto automatiza isso: um script roda a verificação, os resultados viram métricas visíveis em dashboard, e todo o ambiente sobe com um único comando. ## Stack - Bash + curl — script de verificação HTTP (health_check.sh) - Docker — containeriza o script de verificação - Docker Compose — orquestra Prometheus + Grafana junto com a aplicação - Prometheus — coleta métricas - Grafana — visualiza os dados coletados - GitHub Actions — pipeline de CI/CD: builda e testa a imagem a cada push ## Como rodar git clone https://github.com/antoniomanol62-ux/health-check-brisanet.git cd health-check-brisanet docker compose up -d Depois de subir: - Prometheus: http://localhost:9090 - Grafana: http://localhost:3000 (login padrão: admin/admin) ## Estrutura - health_check.sh — verifica status HTTP dos sites e loga o resultado - Dockerfile — containeriza o script - docker-compose.yml — sobe Prometheus e Grafana, com restart automático - .github/workflows/build.yml — pipeline de CI: builda e testa a cada push na main ## Sobre o projeto Construído como prática de DevOps júnior: containerização, orquestração multi-serviço, observabilidade e automação de pipeline — do zero, com foco em entender cada peça antes de empilhar a próxima.
+# uptime-alert-slack
+
+Monitor de disponibilidade de sites em Bash: verifica cada URL, tenta de novo antes de declarar falha e avisa no Slack quando o site realmente caiu. Containerizado, com pipeline de CI no GitHub Actions.
+
+## O problema que resolve
+
+Checar manualmente se um site está no ar é lento e não escala: alguém precisa lembrar, abrir o navegador e conferir cada URL. Pior, uma falha passageira gera falso alarme. Este projeto automatiza a checagem, confirma a falha com retry e manda o alerta direto no canal do time.
+
+## Como funciona
+
+1. Para cada URL da lista, o script faz uma requisição com `curl` e lê o código HTTP.
+2. Se não for 200, tenta novamente (até 3 tentativas, com pausa de 2s entre elas).
+3. Se todas falharem, registra o alerta no log e envia mensagem ao Slack via webhook.
+4. Se a variável `SLACK_WEBHOOK_URL` não estiver definida, o script só registra em log e não quebra.
+
+## Stack
+
+- **Bash + curl**: verificação HTTP (`health_check.sh`)
+- **Docker**: containeriza o script
+- **Docker Compose**: sobe Prometheus e Grafana (ver Roadmap)
+- **GitHub Actions**: builda a imagem a cada push na `main`
+
+## Como rodar
+
+```bash
+git clone https://github.com/antoniomanol62-ux/uptime-alert-slack.git
+cd uptime-alert-slack
+
+# opcional: habilita o alerta no Slack
+export SLACK_WEBHOOK_URL="sua-url-de-webhook"
+
+./health_check.sh
+```
+
+Para alterar os sites monitorados, edite o array `SERVICOS` no início do `health_check.sh`. O log é gravado em `$HOME/health_check.log`.
+
+> A URL do webhook é uma credencial: nunca a coloque no código nem faça commit dela.
+
+## Estrutura
+
+- `health_check.sh`: checagem HTTP, retry e alerta no Slack
+- `Dockerfile`: containeriza o script
+- `docker-compose.yml`: sobe Prometheus e Grafana com restart automático
+- `.github/workflows/`: pipeline de CI
+
+## Roadmap
+
+- [ ] Rodar o health check como serviço no Compose, em loop contínuo
+- [ ] Ler a URL do webhook de um `.env` (com `.env.example`)
+- [ ] Persistir o log em volume
+- [ ] Mover a lista de sites para um arquivo de configuração
+- [ ] Expor métricas para o Prometheus e montar um dashboard no Grafana
+- [ ] Tratar redirects (`curl -L`) e definir timeout (`--max-time`)
+
+## Sobre o projeto
+
+Construído como prática de DevOps: containerização, automação de pipeline e alertas, evoluindo uma peça de cada vez.
