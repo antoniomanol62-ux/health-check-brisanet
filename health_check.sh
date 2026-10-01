@@ -5,7 +5,7 @@ SERVICOS=(
   "https://grupo.brisanet.com.br"
 )
 
-LOG="$HOME/health_check.log"
+LOG="${LOG_FILE:-$HOME/health_check.log}"
 TENTATIVAS=3
 
 for url in "${SERVICOS[@]}"
@@ -14,7 +14,7 @@ do
 
   for tentativa in $(seq 1 $TENTATIVAS)
   do
-    codigo=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+    codigo=$(curl -s -L --max-time 10 -o /dev/null -w "%{http_code}" "$url")
     DATA=$(date "+%Y-%m-%d %H:%M:%S")
 
     if [ "$codigo" -eq 200 ]; then
