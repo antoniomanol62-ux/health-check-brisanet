@@ -1,10 +1,22 @@
-version: '3.8'
 services:
+  health-check:
+    build: .
+    env_file:
+      - .env
+    environment:
+      - LOG_FILE=/logs/health_check.log
+      - TZ=America/Fortaleza
+    volumes:
+      - ./logs:/logs
+    command: ["sh", "-c", "while true; do /app/health_check.sh; sleep 60; done"]
+    restart: unless-stopped
+
   prometheus:
     image: prom/prometheus:latest
     ports:
       - "9090:9090"
     restart: unless-stopped
+
   grafana:
     image: grafana/grafana:latest
     ports:
