@@ -26,15 +26,14 @@ Checar manualmente se um site está no ar é lento e não escala: alguém precis
 git clone https://github.com/antoniomanol62-ux/uptime-alert-slack.git
 cd uptime-alert-slack
 
-# opcional: habilita o alerta no Slack
-export SLACK_WEBHOOK_URL="sua-url-de-webhook"
+cp .env.example .env
+# edite o .env e cole a URL do seu webhook do Slack
 
-./health_check.sh
+docker compose up -d
+docker compose logs -f health-check
 ```
 
-Para alterar os sites monitorados, edite o array `SERVICOS` no início do `health_check.sh`. O log é gravado em `$HOME/health_check.log`.
-
-> A URL do webhook é uma credencial: nunca a coloque no código nem faça commit dela.
+O health check roda em loop (uma rodada por minuto) e grava o log em `./logs/`.
 
 ## Estrutura
 
@@ -44,13 +43,13 @@ Para alterar os sites monitorados, edite o array `SERVICOS` no início do `healt
 - `.github/workflows/`: pipeline de CI
 
 ## Roadmap
-
-- [ ] Rodar o health check como serviço no Compose, em loop contínuo
-- [ ] Ler a URL do webhook de um `.env` (com `.env.example`)
-- [ ] Persistir o log em volume
+- [x] Rodar o health check como serviço no Compose, em loop contínuo
+- [x] Ler a URL do webhook de um `.env` (com `.env.example`)
+- [x] Persistir o log em volume
+- [x] Tratar redirects (`curl -L`) e definir timeout (`--max-time`)
 - [ ] Mover a lista de sites para um arquivo de configuração
 - [ ] Expor métricas para o Prometheus e montar um dashboard no Grafana
-- [ ] Tratar redirects (`curl -L`) e definir timeout (`--max-time`)
+
 
 ## Sobre o projeto
 
