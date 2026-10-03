@@ -1,9 +1,6 @@
 #!/bin/bash
 
-SERVICOS=(
-  "https://www.brisanet.com.br"
-  "https://grupo.brisanet.com.br"
-)
+SERVICOS=(${SITES:-https://example.com})
 
 LOG="${LOG_FILE:-$HOME/health_check.log}"
 TENTATIVAS=3
